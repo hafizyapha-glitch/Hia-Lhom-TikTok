@@ -136,22 +136,22 @@
     </div>
   </div>
   <div class="header-right">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span style="font-size:13px;font-weight:600;color:var(--text-secondary);">เดือน:</span>
-      <select id="monthSelect" class="month-select" onchange="handleMonthChange()">
-        <option value="January">January</option>
-        <option value="February">February</option>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;font-weight:600;color:var(--text-secondary);">เดือน:</span>
+        <select id="monthSelect" class="month-select" onchange="handleMonthChange()">
+          <option value="January">January</option>
         <option value="March">March</option>
         <option value="April">April</option>
         <option value="May">May</option>
         <option value="June">June</option>
         <option value="July">July</option>
         <option value="August">August</option>
-        <option value="September">September</option>
-        <option value="October">October</option>
-        <option value="November">November</option>
-        <option value="December">December</option>
-      </select>
+          <option value="November">November</option>
+          <option value="December">December</option>
+        </select>
+      </div>
+      <span id="lastUpdateWrapper" style="font-size:11px;color:var(--muted);display:none;">อัปเดตข้อมูลล่าสุด: <strong id="lastUpdateDate"></strong></span>
     </div>
     <button id="themeToggle" class="btn btn-outline" style="padding:8px;display:flex;align-items:center;justify-content:center;border-radius:50%;width:36px;height:36px;">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -251,7 +251,8 @@ async function fetchMonthData(month) {
     let response = await fetch(`./data/${month}.csv`);
     if (response.ok) {
       const text = await response.text();
-      Papa.parse(text, { header: true, skipEmptyLines: true, complete: r => processData(r.data, `${month}.csv`) });
+      let lastMod = response.headers.get('Last-Modified');
+      Papa.parse(text, { header: true, skipEmptyLines: true, complete: r => processData(r.data, `${month}.csv`, lastMod) });
       return;
     }
     
@@ -259,20 +260,23 @@ async function fetchMonthData(month) {
     response = await fetch(`./data/${month}.xlsx`);
     if (response.ok) {
       const arrayBuffer = await response.arrayBuffer();
+      let lastMod = response.headers.get('Last-Modified');
       const wb = XLSX.read(arrayBuffer, {type: 'array'});
       const ws = wb.Sheets[wb.SheetNames[0]];
       const json = XLSX.utils.sheet_to_json(ws, {defval: 0});
-      processData(json, `${month}.xlsx`);
+      processData(json, `${month}.xlsx`, lastMod);
       return;
     }
 
     // 3. หากไม่พบข้อมูลใดๆ
     showStatus(`⚠️ ไม่พบไฟล์ข้อมูล ./data/${month}.csv หรือ .xlsx`);
+    document.getElementById('lastUpdateWrapper').style.display = 'none';
     renderAll();
     document.getElementById('tableCount').textContent = `ไม่มีข้อมูลสำหรับเดือน ${month}`;
   } catch (err) {
     console.error(err);
     showStatus(`❌ เกิดข้อผิดพลาดในการโหลดไฟล์เดือน ${month}`);
+    document.getElementById('lastUpdateWrapper').style.display = 'none';
     renderAll();
   }
 }
@@ -545,7 +549,7 @@ function clearFilters() {
   renderAll(); 
 }
 
-function processData(rows, filename) {
+function processData(rows, filename, lastModStr = null) {
   try {
     allData=rows.map(r=>{
       const campaign=r['Campaign name']||r['campaign']||'';
@@ -561,9 +565,15 @@ function processData(rows, filename) {
     populateBranchFilter(); 
     renderAll();
 
+    const dateObj = lastModStr ? new Date(lastModStr) : new Date();
+    const dateStr = dateObj.toLocaleString('th-TH', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    document.getElementById('lastUpdateDate').textContent = dateStr;
+    document.getElementById('lastUpdateWrapper').style.display = 'inline-flex';
+
     showStatus(`✅ โหลดข้อมูล ${filename} สำเร็จ: ${allData.length} รายการ`);
   } catch(e) { 
     showStatus('❌ เกิดข้อผิดพลาดในการประมวลผลข้อมูล'); 
+    document.getElementById('lastUpdateWrapper').style.display = 'none';
   }
 }
 
