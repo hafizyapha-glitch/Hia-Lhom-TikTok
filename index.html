@@ -246,25 +246,23 @@
 
   <div id="kpiSection"></div>
 
-  <div class="charts-grid">
-    <div class="chart-card wide">
-      <div class="chart-title">ยอดวิว View แยกตามสาขา</div>
-      <div class="chart-sub">เปรียบเทียบยอดเข้าชมวิดีโอ (Video Views) และต้นทุนการรับชม (CPV) ในแต่ละสาขา</div>
-      <div class="chart-wrap"><canvas id="viewChart"></canvas></div>
+  <!-- รวมกราฟและเพิ่ม Filter เลือกประเภท -->
+  <div class="chart-card wide" style="margin-bottom: 24px;">
+    <div class="table-header" style="padding: 0 0 16px 0; margin-bottom: 12px; border-bottom: 1px solid var(--border);">
+      <div>
+        <div class="chart-title" id="mainChartTitle">ยอดวิว View แยกตามสาขา</div>
+        <div class="chart-sub" id="mainChartSub" style="margin-bottom: 0;">เปรียบเทียบยอดเข้าชมวิดีโอ (Video Views) และต้นทุนการรับชม (CPV) ในแต่ละสาขา</div>
+      </div>
+      <div>
+        <select id="chartMetricFilter" class="month-select" onchange="renderCharts()" style="padding-top: 6px; padding-bottom: 6px; font-size: 13px;">
+          <option value="view">ยอดวิว (View)</option>
+          <option value="follow">ยอดฟอล (Follower)</option>
+          <option value="engagement">การมีส่วนร่วม (Engagement)</option>
+          <option value="spend">ค่าใช้จ่าย (Spend)</option>
+        </select>
+      </div>
     </div>
-    <div class="chart-card wide">
-      <div class="chart-title">ยอดฟอล Follower แยกตามสาขา</div>
-      <div class="chart-sub">เปรียบเทียบยอดผู้ติดตามใหม่ (New Follows) และต้นทุนต่อผู้ติดตาม (CPF) ในแต่ละสาขา</div>
-      <div class="chart-wrap"><canvas id="followChart"></canvas></div>
-    </div>
-  </div>
-
-  <div class="charts-grid" style="margin-top:0px;">
-    <div class="chart-card wide">
-      <div class="chart-title">Engagement แยกตามสาขา</div>
-      <div class="chart-sub">Likes, Follows, Comments, Shares รวมกันทุก Ad ในแต่ละสาขา</div>
-      <div class="chart-wrap tall"><canvas id="engChart"></canvas></div>
-    </div>
+    <div class="chart-wrap tall"><canvas id="mainChart"></canvas></div>
   </div>
 
   <!-- ส่วน Top Ads Carousel -->
@@ -337,7 +335,7 @@ function getMockData(month) {
     { 'Ad name': 'Ad_Promo_1', 'Campaign name': 'Promo | สาขาปิ่นเกล้า | Video view', 'Spend': 1250.50, 'Reach': 45000, 'Impressions': 52000, 'Video views': 18000, 'Paid likes': 450, 'Paid comments': 25, 'Paid shares': 40, 'Paid follows': 80 },
     { 'Ad name': 'Ad_Promo_2', 'Campaign name': 'Promo | สาขาบางนา | Follower', 'Spend': 2100.00, 'Reach': 60000, 'Impressions': 71000, 'Video views': 15000, 'Paid likes': 600, 'Paid comments': 45, 'Paid shares': 65, 'Paid follows': 320 },
     { 'Ad name': 'Ad_Brand_1', 'Campaign name': 'Brand | Hia Lhom | Video view', 'Cost': 4500.00, 'Reach': 150000, 'Impressions': 180000, 'Video views': 85000, 'Paid likes': 2100, 'Paid comments': 120, 'Paid shares': 300, 'Paid follows': 450 },
-    { 'Ad name': 'Ad_Review_1', 'Campaign name': 'Review | สาขารังสิต | Video view', 'Cost': 850.75, 'Reach': 25000, 'Impressions': 28000, 'Video views': 12000, 'Paid likes': 250, 'Paid comments': 10, 'Paid shares': 15, 'Paid follows': 45 }
+    { 'Ad name': "KOLs-OLE' CH -ตามหาทองนพคุณ", 'Campaign name': 'Review | สาขารังสิต | Video view', 'Cost': 850.75, 'Reach': 25000, 'Impressions': 28000, 'Video views': 12000, 'Paid likes': 250, 'Paid comments': 10, 'Paid shares': 15, 'Paid follows': 45 }
   ];
 }
 
@@ -362,7 +360,7 @@ async function fetchCreativeLinks() {
         'Ad_Promo_1': 'https://www.tiktok.com/',
         'Ad_Promo_2': 'https://www.tiktok.com/',
         'Ad_Brand_1': 'https://www.tiktok.com/',
-        'Ad_Review_1': 'https://www.tiktok.com/'
+        "KOLs-OLE' CH -ตามหาทองนพคุณ": 'https://www.tiktok.com/'
       };
       return;
     }
@@ -635,6 +633,28 @@ function renderCharts() {
   const d=filteredData;
   const branches=[...new Set(d.map(r=>r.branch))];
 
+  // อ่านค่าว่าผู้ใช้เลือกดูกราฟอะไร
+  const metric = document.getElementById('chartMetricFilter') ? document.getElementById('chartMetricFilter').value : 'view';
+
+  // อัปเดตหัวข้อและคำอธิบายตามกราฟที่เลือก
+  const titleEl = document.getElementById('mainChartTitle');
+  const subEl = document.getElementById('mainChartSub');
+  if(titleEl && subEl) {
+    if(metric === 'view') {
+      titleEl.textContent = 'ยอดวิว View แยกตามสาขา';
+      subEl.textContent = 'เปรียบเทียบยอดเข้าชมวิดีโอ (Video Views) และต้นทุนการรับชม (CPV) ในแต่ละสาขา';
+    } else if(metric === 'follow') {
+      titleEl.textContent = 'ยอดฟอล Follower แยกตามสาขา';
+      subEl.textContent = 'เปรียบเทียบยอดผู้ติดตามใหม่ (New Follows) และต้นทุนต่อผู้ติดตาม (CPF) ในแต่ละสาขา';
+    } else if(metric === 'engagement') {
+      titleEl.textContent = 'Engagement แยกตามสาขา';
+      subEl.textContent = 'Likes, Follows, Comments, Shares รวมกันทุก Ad ในแต่ละสาขา';
+    } else if(metric === 'spend') {
+      titleEl.textContent = 'ค่าใช้จ่าย Spend แยกตามสาขา';
+      subEl.textContent = 'เปรียบเทียบยอดเงินที่ใช้ (Cost / Spend) ในแต่ละสาขา';
+    }
+  }
+
   function axisStyle() {
     return { grid:{color:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)'}, ticks:{color:isDark?'#94A3B8':'#6B7280',font:{family:'Inter,Noto Sans Thai',size:11}}, border:{color:'transparent'} };
   }
@@ -671,103 +691,86 @@ function renderCharts() {
      };
   }
 
-  let viewData = branches.map(b => {
-      let cost = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.cost,0);
-      let views = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.videoViews,0);
-      let cpv = views > 0 ? cost / views : 0;
-      return { branch: b, val: views, cpv: cpv };
-  }).sort((a,b) => b.val - a.val);
+  if (metric === 'view') {
+      let viewData = branches.map(b => {
+          let cost = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.cost,0);
+          let views = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.videoViews,0);
+          let cpv = views > 0 ? cost / views : 0;
+          return { branch: b, val: views, cpv: cpv };
+      }).sort((a,b) => b.val - a.val);
 
-  charts.view = new Chart(document.getElementById('viewChart'), {
-      type: 'bar',
-      data: {
-          labels: viewData.map(v => v.branch),
+      charts.main = new Chart(document.getElementById('mainChart'), {
+          type: 'bar',
+          data: {
+              labels: viewData.map(v => v.branch),
+              datasets: [
+                { label: 'Video Views', data: viewData.map(v => v.val), backgroundColor: '#8B5CF6', borderRadius: 6, borderSkipped: false, yAxisID: 'y', order: 2 },
+                { type: 'line', label: 'Cost Per View (CPV)', data: viewData.map(v => v.cpv), borderColor: '#F59E0B', backgroundColor: '#F59E0B', borderWidth: 2, tension: 0.3, pointRadius: 4, yAxisID: 'y1', order: 1 }
+              ]
+          },
+          options: mixedChartOpts('Video Views', 'Cost Per View (฿)')
+      });
+  } 
+  else if (metric === 'follow') {
+      let followData = branches.map(b => {
+          let cost = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.cost,0);
+          let follows = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.follows,0);
+          let cpf = follows > 0 ? cost / follows : 0;
+          return { branch: b, val: follows, cpf: cpf };
+      }).sort((a,b) => b.val - a.val);
+
+      charts.main = new Chart(document.getElementById('mainChart'), {
+          type: 'bar',
+          data: {
+              labels: followData.map(v => v.branch),
+              datasets: [
+                { label: 'New Follows', data: followData.map(v => v.val), backgroundColor: '#10B981', borderRadius: 6, borderSkipped: false, yAxisID: 'y', order: 2 },
+                { type: 'line', label: 'Cost Per Follower (CPF)', data: followData.map(v => v.cpf), borderColor: '#F43F5E', backgroundColor: '#F43F5E', borderWidth: 2, tension: 0.3, pointRadius: 4, yAxisID: 'y1', order: 1 }
+              ]
+          },
+          options: mixedChartOpts('Follows', 'Cost Per Follower (฿)')
+      });
+  }
+  else if (metric === 'engagement') {
+      let engData = branches.map(b => {
+          let likes = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.likes,0);
+          let follows = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.follows,0);
+          let comments = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.comments,0);
+          let shares = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.shares,0);
+          return { branch: b, likes, follows, comments, shares, total: likes+follows+comments+shares };
+      }).sort((a,b) => b.total - a.total);
+
+      charts.main = new Chart(document.getElementById('mainChart'), {
+        type: 'bar',
+        data: {
+          labels: engData.map(e => e.branch),
           datasets: [
-            {
-              label: 'Video Views',
-              data: viewData.map(v => v.val),
-              backgroundColor: '#8B5CF6',
-              borderRadius: 6,
-              borderSkipped: false,
-              yAxisID: 'y',
-              order: 2
-            },
-            {
-              type: 'line',
-              label: 'Cost Per View (CPV)',
-              data: viewData.map(v => v.cpv),
-              borderColor: '#F59E0B',
-              backgroundColor: '#F59E0B',
-              borderWidth: 2,
-              tension: 0.3,
-              pointRadius: 4,
-              yAxisID: 'y1',
-              order: 1
-            }
+            {label:'Likes', data: engData.map(e => e.likes), backgroundColor:'#2563EB', borderRadius:4, borderSkipped:false},
+            {label:'Follows', data: engData.map(e => e.follows), backgroundColor:'#8B5CF6', borderRadius:4, borderSkipped:false},
+            {label:'Comments', data: engData.map(e => e.comments), backgroundColor:'#10B981', borderRadius:4, borderSkipped:false},
+            {label:'Shares', data: engData.map(e => e.shares), backgroundColor:'#F59E0B', borderRadius:4, borderSkipped:false},
           ]
-      },
-      options: mixedChartOpts('Video Views', 'Cost Per View (฿)')
-  });
+        },
+        options: {...chartOpts('Engagement', true), scales:{x:{stacked:true,...axisStyle()},y:{stacked:true,...axisStyle()}}}
+      });
+  }
+  else if (metric === 'spend') {
+      let spendData = branches.map(b => {
+          let cost = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.cost,0);
+          return { branch: b, val: cost };
+      }).sort((a,b) => b.val - a.val);
 
-  let followData = branches.map(b => {
-      let cost = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.cost,0);
-      let follows = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.follows,0);
-      let cpf = follows > 0 ? cost / follows : 0;
-      return { branch: b, val: follows, cpf: cpf };
-  }).sort((a,b) => b.val - a.val);
-
-  charts.follow = new Chart(document.getElementById('followChart'), {
-      type: 'bar',
-      data: {
-          labels: followData.map(v => v.branch),
-          datasets: [
-            {
-              label: 'New Follows',
-              data: followData.map(v => v.val),
-              backgroundColor: '#10B981',
-              borderRadius: 6,
-              borderSkipped: false,
-              yAxisID: 'y',
-              order: 2
-            },
-            {
-              type: 'line',
-              label: 'Cost Per Follower (CPF)',
-              data: followData.map(v => v.cpf),
-              borderColor: '#F43F5E',
-              backgroundColor: '#F43F5E',
-              borderWidth: 2,
-              tension: 0.3,
-              pointRadius: 4,
-              yAxisID: 'y1',
-              order: 1
-            }
-          ]
-      },
-      options: mixedChartOpts('Follows', 'Cost Per Follower (฿)')
-  });
-
-  let engData = branches.map(b => {
-      let likes = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.likes,0);
-      let follows = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.follows,0);
-      let comments = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.comments,0);
-      let shares = d.filter(r=>r.branch===b).reduce((s,r)=>s+r.shares,0);
-      return { branch: b, likes, follows, comments, shares, total: likes+follows+comments+shares };
-  }).sort((a,b) => b.total - a.total);
-
-  charts.eng = new Chart(document.getElementById('engChart'), {
-    type: 'bar',
-    data: {
-      labels: engData.map(e => e.branch),
-      datasets: [
-        {label:'Likes', data: engData.map(e => e.likes), backgroundColor:'#2563EB', borderRadius:4, borderSkipped:false},
-        {label:'Follows', data: engData.map(e => e.follows), backgroundColor:'#8B5CF6', borderRadius:4, borderSkipped:false},
-        {label:'Comments', data: engData.map(e => e.comments), backgroundColor:'#10B981', borderRadius:4, borderSkipped:false},
-        {label:'Shares', data: engData.map(e => e.shares), backgroundColor:'#F59E0B', borderRadius:4, borderSkipped:false},
-      ]
-    },
-    options: {...chartOpts('Engagement', true), scales:{x:{stacked:true,...axisStyle()},y:{stacked:true,...axisStyle()}}}
-  });
+      charts.main = new Chart(document.getElementById('mainChart'), {
+          type: 'bar',
+          data: {
+              labels: spendData.map(v => v.branch),
+              datasets: [
+                { label: 'Spend (฿)', data: spendData.map(v => v.val), backgroundColor: '#F43F5E', borderRadius: 6, borderSkipped: false }
+              ]
+          },
+          options: chartOpts('Spend (฿)', false)
+      });
+  }
 }
 
 function renderTopAds() {
@@ -798,8 +801,8 @@ function renderTopAds() {
     const linkTagEnd = link ? `</a>` : `</div>`;
     const iconHtml = link ? `<div class="external-link-icon" title="เปิดในแท็บใหม่"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>` : '';
     
-    // ตั้งชื่อไฟล์รูปให้ตรงกับ Ad name พร้อมจัดการช่องว่างและอักขระพิเศษ
-    const cleanAdName = r.ad.trim();
+    // ตั้งชื่อไฟล์รูปให้ตรงกับ Ad name พร้อมจัดการช่องว่างและอักขระพิเศษ (ลบอัญประกาศออก)
+    const cleanAdName = r.ad.replace(/['"]/g, '').trim();
     const encodedName = encodeURIComponent(cleanAdName);
     const jpgSrc = `./images/${encodedName}.jpg`;
     const pngSrc = `./images/${encodedName}.png`;
