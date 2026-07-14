@@ -114,6 +114,69 @@
 
   #statusBar { display: none; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; padding: 12px 16px; font-size: 14px; font-weight: 500; color: var(--green); margin-bottom: 16px; }
 
+  /* --- Top Ads Carousel Styles --- */
+  .carousel-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 16px;
+    padding-bottom: 16px;
+    scroll-snap-type: x mandatory;
+    margin-bottom: 24px;
+  }
+  .carousel-container::-webkit-scrollbar { height: 8px; }
+  .carousel-container::-webkit-scrollbar-track { background: var(--surface); border-radius: 4px; }
+  .carousel-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  
+  .carousel-card {
+    flex: 0 0 220px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    scroll-snap-align: start;
+    box-shadow: var(--shadow-sm);
+    transition: transform .2s, box-shadow .2s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .carousel-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+  
+  .carousel-image-wrapper {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background: var(--surface);
+    position: relative;
+    display: block;
+    overflow: hidden;
+  }
+  .carousel-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .3s;
+  }
+  .carousel-image-wrapper:hover .carousel-image {
+    transform: scale(1.05);
+  }
+  
+  .external-link-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 6px;
+    border-radius: 50%;
+    backdrop-filter: blur(4px);
+    display: flex;
+  }
+  
+  .carousel-info { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+  .carousel-ad-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .carousel-stat { font-size: 12px; color: var(--text-secondary); display: flex; justify-content: space-between; margin-bottom: 2px; }
+  .carousel-stat strong { color: var(--text); font-family: 'Inter', sans-serif; }
+
   @media (max-width: 1200px) {
     .kpi-grid.row6 { grid-template-columns: repeat(3,1fr); }
     .kpi-grid.row5 { grid-template-columns: repeat(3,1fr); }
@@ -205,6 +268,17 @@
     </div>
   </div>
 
+  <!-- ส่วน Top Ads Carousel -->
+  <div class="charts-grid" style="margin-top:0px;">
+    <div class="chart-card wide">
+      <div class="chart-title">Top 10 Ads Performance (ตามยอดวิว)</div>
+      <div class="chart-sub">โฆษณาที่มียอดเข้าชมวิดีโอสูงสุด 10 อันดับแรก (เลื่อนซ้าย-ขวาเพื่อดูเพิ่มเติม)</div>
+      <div class="carousel-container" id="topAdsCarousel" style="margin-bottom: 0;">
+        <!-- ข้อมูลจะถูก Render ผ่าน JavaScript -->
+      </div>
+    </div>
+  </div>
+
   <div class="table-card" style="margin-top:0px;">
     <div class="table-header">
       <div>
@@ -245,6 +319,16 @@ function parseObjective(campaign) {
   return 'Other';
 }
 
+// ข้อมูลจำลองสำหรับโหมด Preview (กรณีอ้างอิงไฟล์ Local ไม่ได้)
+function getMockData(month) {
+  return [
+    { 'Ad name': 'Ad_Promo_1', 'Campaign name': 'Promo | สาขาปิ่นเกล้า | Video view', 'Cost': 1250.50, 'Reach': 45000, 'Impressions': 52000, 'Video views': 18000, 'Paid likes': 450, 'Paid comments': 25, 'Paid shares': 40, 'Paid follows': 80 },
+    { 'Ad name': 'Ad_Promo_2', 'Campaign name': 'Promo | สาขาบางนา | Follower', 'Cost': 2100.00, 'Reach': 60000, 'Impressions': 71000, 'Video views': 15000, 'Paid likes': 600, 'Paid comments': 45, 'Paid shares': 65, 'Paid follows': 320 },
+    { 'Ad name': 'Ad_Brand_1', 'Campaign name': 'Brand | Hia Lhom | Video view', 'Cost': 4500.00, 'Reach': 150000, 'Impressions': 180000, 'Video views': 85000, 'Paid likes': 2100, 'Paid comments': 120, 'Paid shares': 300, 'Paid follows': 450 },
+    { 'Ad name': 'Ad_Review_1', 'Campaign name': 'Review | สาขารังสิต | Video view', 'Cost': 850.75, 'Reach': 25000, 'Impressions': 28000, 'Video views': 12000, 'Paid likes': 250, 'Paid comments': 10, 'Paid shares': 15, 'Paid follows': 45 }
+  ];
+}
+
 let activeTab = "all";
 let allData = [];
 let filteredData = [];
@@ -254,11 +338,64 @@ let currentMonthStr = "";
 let prevMonthStr = "";
 let hasPrevData = false;
 let charts = {};
+let creativeLinks = {}; // ตัวแปรเก็บข้อมูล Link
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
+async function fetchCreativeLinks() {
+  try {
+    // เช็คสภาพแวดล้อม (หากไม่ได้รันผ่าน HTTP/HTTPS จะทำให้ดึงไฟล์จาก Local ไม่ได้)
+    if (window.location.protocol === 'blob:' || window.location.protocol === 'about:' || window.location.protocol === 'data:') {
+      creativeLinks = {
+        'Ad_Promo_1': 'https://www.tiktok.com/',
+        'Ad_Promo_2': 'https://www.tiktok.com/',
+        'Ad_Brand_1': 'https://www.tiktok.com/',
+        'Ad_Review_1': 'https://www.tiktok.com/'
+      };
+      return;
+    }
+
+    let res = await fetch(`./data/TikTok_Creative_Link.csv`);
+    if (res.ok) {
+      const text = await res.text();
+      Papa.parse(text, { 
+        header: true, skipEmptyLines: true, 
+        complete: r => {
+          r.data.forEach(row => {
+            const adName = row['Ad name'] || row['Ad Name'] || row['ad'];
+            const link = row['Link'] || row['URL'] || row['Creative Link'];
+            if(adName && link) creativeLinks[adName] = link;
+          });
+        } 
+      });
+      return;
+    }
+    res = await fetch(`./data/TikTok_Creative_Link.xlsx`);
+    if (res.ok) {
+      const buffer = await res.arrayBuffer();
+      const wb = XLSX.read(buffer, {type: 'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(ws, {defval: ''});
+      data.forEach(row => {
+        const adName = row['Ad name'] || row['Ad Name'] || row['ad'];
+        const link = row['Link'] || row['URL'] || row['Creative Link'];
+        if(adName && link) creativeLinks[adName] = link;
+      });
+    }
+  } catch (e) { 
+    // เปลี่ยนจาก console.error เป็น console.warn เพื่อไม่ให้มี error แดงขึ้น
+    console.warn("ไม่สามารถดึงไฟล์ TikTok_Creative_Link ได้ (อาจติด CORS หรือเปิดผ่าน file://):", e.message); 
+  }
+}
+
 async function fetchRawData(month) {
   try {
+    // ป้องกัน Failed to parse URL บนโหมด Preview/Sandbox
+    if (window.location.protocol === 'blob:' || window.location.protocol === 'about:' || window.location.protocol === 'data:') {
+      console.warn(`[Preview Mode] แสดงข้อมูล Mock สำหรับเดือน ${month} เนื่องจากไม่สามารถดึงไฟล์ Local ได้`);
+      return { data: getMockData(month), file: `(Mock) ${month}.csv` };
+    }
+
     let res = await fetch(`./data/${month}.csv`);
     if (res.ok) {
       const text = await res.text();
@@ -276,7 +413,10 @@ async function fetchRawData(month) {
       const data = XLSX.utils.sheet_to_json(ws, {defval: 0});
       return { data, lastMod, file: `${month}.xlsx` };
     }
-  } catch (e) { console.error(e); }
+  } catch (e) { 
+    // จับ Error (เช่น CORS หากรันด้วย file://) ให้ออกมาเป็น warn แทน 
+    console.warn(`ไม่สามารถดึงข้อมูล ./data/${month} ได้ กรุณาเปิดผ่าน Local Server:`, e.message); 
+  }
   return null;
 }
 
@@ -300,7 +440,6 @@ async function fetchMonthData(month) {
   const pIdx = mIdx === 0 ? 11 : mIdx - 1;
   prevMonthStr = months[pIdx];
 
-  // Try to load both current month and previous month
   const currentRaw = await fetchRawData(currentMonthStr);
   const prevRaw = await fetchRawData(prevMonthStr);
 
@@ -343,8 +482,9 @@ function handleMonthChange() {
   fetchMonthData(month);
 }
 
-// Initial Loading logic to default to current month
-(function init() {
+// Initial Loading logic
+(async function init() {
+  await fetchCreativeLinks(); // โหลดลิงก์ก่อนเริ่ม
   const currentMonthIndex = new Date().getMonth(); 
   const initialMonth = months[currentMonthIndex];
   document.getElementById('monthSelect').value = initialMonth;
@@ -359,6 +499,7 @@ function destroyCharts() {
 function renderAll() { 
   renderKPIs(); 
   renderCharts(); 
+  renderTopAds();
   renderTable(); 
 }
 
@@ -617,6 +758,45 @@ function renderCharts() {
     },
     options: {...chartOpts('Engagement', true), scales:{x:{stacked:true,...axisStyle()},y:{stacked:true,...axisStyle()}}}
   });
+}
+
+function renderTopAds() {
+  const container = document.getElementById('topAdsCarousel');
+  
+  // จัดเรียงข้อมูลที่ Filter แล้ว ตาม Video Views จากมากไปน้อย และดึงมาแค่ 10 อันดับแรก
+  let top10 = [...filteredData].sort((a, b) => b.videoViews - a.videoViews).slice(0, 10);
+  
+  if (!top10.length) {
+    container.innerHTML = '<div style="padding: 24px; color: var(--muted); font-size: 14px;">ไม่มีข้อมูลโฆษณาในฟิลเตอร์นี้</div>';
+    return;
+  }
+
+  container.innerHTML = top10.map((r, i) => {
+    // ดึง Link จากข้อมูล หากไม่มีให้เป็นค่าว่าง
+    const link = creativeLinks[r.ad] || ''; 
+    const linkTagStart = link ? `<a href="${link}" target="_blank" rel="noopener noreferrer" class="carousel-image-wrapper">` : `<div class="carousel-image-wrapper">`;
+    const linkTagEnd = link ? `</a>` : `</div>`;
+    const iconHtml = link ? `<div class="external-link-icon" title="เปิดในแท็บใหม่"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>` : '';
+    
+    // ตั้งชื่อไฟล์รูปให้ตรงกับ Ad name (สมมติว่าเป็น .jpg)
+    // หากรูปโหลดไม่สำเร็จจะ fallback ไปยังภาพ SVG "No Image"
+    const imgSrc = `./images/${r.ad}.jpg`;
+    const fallbackImg = `this.onerror=null; this.src='data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22293%22 viewBox=%220 0 220 293%22 fill=%22%23E5E7EB%22%3E%3Crect width=%22220%22 height=%22293%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2214%22 fill=%22%2394A3B8%22%3ENo Image%3C/text%3E%3C/svg%3E';`;
+
+    return `
+      <div class="carousel-card">
+        ${linkTagStart}
+          <img src="${imgSrc}" class="carousel-image" alt="${r.ad}" onerror="${fallbackImg}">
+          ${iconHtml}
+        ${linkTagEnd}
+        <div class="carousel-info">
+          <div class="carousel-ad-title" title="${r.ad}">#${i+1} ${r.ad}</div>
+          <div class="carousel-stat"><span>Views:</span> <strong>${r.videoViews.toLocaleString()}</strong></div>
+          <div class="carousel-stat"><span>Cost:</span> <strong>฿${r.cost.toFixed(2)}</strong></div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 function switchTab(tab,el) { 
