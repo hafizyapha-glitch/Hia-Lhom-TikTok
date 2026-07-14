@@ -121,7 +121,6 @@
     gap: 16px;
     padding-bottom: 16px;
     scroll-snap-type: x mandatory;
-    margin-bottom: 24px;
   }
   .carousel-container::-webkit-scrollbar { height: 8px; }
   .carousel-container::-webkit-scrollbar-track { background: var(--surface); border-radius: 4px; }
@@ -269,13 +268,21 @@
   </div>
 
   <!-- ส่วน Top Ads Carousel -->
-  <div class="charts-grid" style="margin-top:0px;">
-    <div class="chart-card wide">
-      <div class="chart-title">Top 10 Ads Performance (ตามยอดวิว)</div>
-      <div class="chart-sub">โฆษณาที่มียอดเข้าชมวิดีโอสูงสุด 10 อันดับแรก (เลื่อนซ้าย-ขวาเพื่อดูเพิ่มเติม)</div>
-      <div class="carousel-container" id="topAdsCarousel" style="margin-bottom: 0;">
-        <!-- ข้อมูลจะถูก Render ผ่าน JavaScript -->
+  <div class="chart-card" style="margin-top: 0px; padding-bottom: 8px;">
+    <div class="table-header" style="padding: 0 0 16px 0; margin-bottom: 12px; border-bottom: 1px solid var(--border);">
+      <div>
+        <div class="chart-title">Ads Performance Gallery</div>
+        <div class="chart-sub" style="margin-bottom: 0;">ภาพรวมชิ้นงานโฆษณา (เฉพาะแอดที่มีการจ่ายเงิน)</div>
       </div>
+      <div>
+        <select id="adsRankFilter" class="month-select" onchange="renderTopAds()" style="padding-top: 6px; padding-bottom: 6px; font-size: 13px;">
+          <option value="top">Top 10 (ยอดวิวสูงสุด)</option>
+          <option value="bottom">Bottom 10 (ยอดวิวต่ำสุด)</option>
+        </select>
+      </div>
+    </div>
+    <div class="carousel-container" id="topAdsCarousel">
+      <!-- ข้อมูลจะถูก Render ผ่าน JavaScript -->
     </div>
   </div>
 
@@ -327,8 +334,8 @@ function parseObjective(campaign) {
 // ข้อมูลจำลองสำหรับโหมด Preview (กรณีอ้างอิงไฟล์ Local ไม่ได้)
 function getMockData(month) {
   return [
-    { 'Ad name': 'Ad_Promo_1', 'Campaign name': 'Promo | สาขาปิ่นเกล้า | Video view', 'Cost': 1250.50, 'Reach': 45000, 'Impressions': 52000, 'Video views': 18000, 'Paid likes': 450, 'Paid comments': 25, 'Paid shares': 40, 'Paid follows': 80 },
-    { 'Ad name': 'Ad_Promo_2', 'Campaign name': 'Promo | สาขาบางนา | Follower', 'Cost': 2100.00, 'Reach': 60000, 'Impressions': 71000, 'Video views': 15000, 'Paid likes': 600, 'Paid comments': 45, 'Paid shares': 65, 'Paid follows': 320 },
+    { 'Ad name': 'Ad_Promo_1', 'Campaign name': 'Promo | สาขาปิ่นเกล้า | Video view', 'Spend': 1250.50, 'Reach': 45000, 'Impressions': 52000, 'Video views': 18000, 'Paid likes': 450, 'Paid comments': 25, 'Paid shares': 40, 'Paid follows': 80 },
+    { 'Ad name': 'Ad_Promo_2', 'Campaign name': 'Promo | สาขาบางนา | Follower', 'Spend': 2100.00, 'Reach': 60000, 'Impressions': 71000, 'Video views': 15000, 'Paid likes': 600, 'Paid comments': 45, 'Paid shares': 65, 'Paid follows': 320 },
     { 'Ad name': 'Ad_Brand_1', 'Campaign name': 'Brand | Hia Lhom | Video view', 'Cost': 4500.00, 'Reach': 150000, 'Impressions': 180000, 'Video views': 85000, 'Paid likes': 2100, 'Paid comments': 120, 'Paid shares': 300, 'Paid follows': 450 },
     { 'Ad name': 'Ad_Review_1', 'Campaign name': 'Review | สาขารังสิต | Video view', 'Cost': 850.75, 'Reach': 25000, 'Impressions': 28000, 'Video views': 12000, 'Paid likes': 250, 'Paid comments': 10, 'Paid shares': 15, 'Paid follows': 45 }
   ];
@@ -388,7 +395,6 @@ async function fetchCreativeLinks() {
       });
     }
   } catch (e) { 
-    // เปลี่ยนจาก console.error เป็น console.warn เพื่อไม่ให้มี error แดงขึ้น
     console.warn("ไม่สามารถดึงไฟล์ TikTok_Creative_Link ได้ (อาจติด CORS หรือเปิดผ่าน file://):", e.message); 
   }
 }
@@ -419,7 +425,6 @@ async function fetchRawData(month) {
       return { data, lastMod, file: `${month}.xlsx` };
     }
   } catch (e) { 
-    // จับ Error (เช่น CORS หากรันด้วย file://) ให้ออกมาเป็น warn แทน 
     console.warn(`ไม่สามารถดึงข้อมูล ./data/${month} ได้ กรุณาเปิดผ่าน Local Server:`, e.message); 
   }
   return null;
@@ -767,16 +772,26 @@ function renderCharts() {
 
 function renderTopAds() {
   const container = document.getElementById('topAdsCarousel');
+  const rankFilter = document.getElementById('adsRankFilter') ? document.getElementById('adsRankFilter').value : 'top';
   
-  // จัดเรียงข้อมูลที่ Filter แล้ว ตาม Video Views จากมากไปน้อย และดึงมาแค่ 10 อันดับแรก
-  let top10 = [...filteredData].sort((a, b) => b.videoViews - a.videoViews).slice(0, 10);
+  // กรองเอาเฉพาะโฆษณาที่มีการใช้จ่าย (cost > 0) เพื่อไม่ให้ Bottom 10 ดึงแอดที่ปิดไปแล้วมาแสดง
+  let validAds = [...filteredData].filter(r => r.cost > 0);
   
-  if (!top10.length) {
+  // จัดเรียงข้อมูลที่ Filter แล้ว ตาม Video Views
+  if (rankFilter === 'bottom') {
+    validAds.sort((a, b) => a.videoViews - b.videoViews); // ยอดวิวน้อยไปมาก (Bottom)
+  } else {
+    validAds.sort((a, b) => b.videoViews - a.videoViews); // ยอดวิวมากไปน้อย (Top)
+  }
+  
+  let displayData = validAds.slice(0, 10);
+  
+  if (!displayData.length) {
     container.innerHTML = '<div style="padding: 24px; color: var(--muted); font-size: 14px;">ไม่มีข้อมูลโฆษณาในฟิลเตอร์นี้</div>';
     return;
   }
 
-  container.innerHTML = top10.map((r, i) => {
+  container.innerHTML = displayData.map((r, i) => {
     // ดึง Link จากข้อมูล หากไม่มีให้เป็นค่าว่าง
     const link = creativeLinks[r.ad] || ''; 
     const linkTagStart = link ? `<a href="${link}" target="_blank" rel="noopener noreferrer" class="carousel-image-wrapper">` : `<div class="carousel-image-wrapper">`;
