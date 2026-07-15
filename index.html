@@ -56,13 +56,14 @@
   body.dark-mode .month-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394A3B8' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
   .month-select:focus { border-color: var(--primary); }
 
-  .filter-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-  .filter-row select { background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 8px 32px 8px 16px; font-size: 13px; font-weight: 500; font-family: 'Inter','Noto Sans Thai',sans-serif; outline: none; cursor: pointer; transition: border-color .2s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748B' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; box-shadow: var(--shadow-sm); }
-  body.dark-mode .filter-row select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394A3B8' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
-  .filter-row select:focus { border-color: var(--primary); }
-  .filter-label { font-size: 14px; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
-  .clear-btn { background: transparent; border: 1px solid transparent; border-radius: 8px; color: var(--muted); padding: 8px 12px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; }
-  .clear-btn:hover { color: var(--text); background: var(--surface); border-color: var(--border); }
+  /* --- Header Filters (ลดขนาดลง 10%) --- */
+  .header-filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
+  .header-filter-select { background: var(--card); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 6px 28px 6px 12px; font-size: 12px; font-weight: 500; font-family: 'Inter','Noto Sans Thai',sans-serif; outline: none; cursor: pointer; transition: border-color .2s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2364748B' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; box-shadow: var(--shadow-sm); }
+  body.dark-mode .header-filter-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394A3B8' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+  .header-filter-select:focus { border-color: var(--primary); }
+  .header-filter-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+  .header-clear-btn { background: transparent; border: 1px solid transparent; border-radius: 6px; color: var(--muted); padding: 6px 10px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all .2s; }
+  .header-clear-btn:hover { color: var(--text); background: var(--surface); border-color: var(--border); }
 
   .kpi-group-label { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 16px; margin-top: 8px; }
   .kpi-grid { display: grid; gap: 16px; margin-bottom: 8px; }
@@ -188,6 +189,7 @@
     .header-right { width: 100%; justify-content: space-between; }
     .kpi-grid.row6, .kpi-grid.row5 { grid-template-columns: repeat(2,1fr); }
     td, th { padding: 12px 16px; }
+    .header-filters { justify-content: flex-start; }
   }
   @media (max-width: 600px) {
     .kpi-grid.row6, .kpi-grid.row5 { grid-template-columns: 1fr; }
@@ -205,27 +207,44 @@
     </div>
   </div>
   <div class="header-right">
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-size:13px;font-weight:600;color:var(--text-secondary);">เดือน:</span>
-        <select id="monthSelect" class="month-select" onchange="handleMonthChange()">
-          <option value="January">January</option>
-          <option value="February">February</option>
-          <option value="March">March</option>
-          <option value="April">April</option>
-          <option value="May">May</option>
-          <option value="June">June</option>
-          <option value="July">July</option>
-          <option value="August">August</option>
-          <option value="September">September</option>
-          <option value="October">October</option>
-          <option value="November">November</option>
-          <option value="December">December</option>
-        </select>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+      
+      <!-- แถวบน: เลือกเดือน และ วันที่อัปเดต -->
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span id="lastUpdateWrapper" style="font-size:11px;color:var(--muted);display:none;">อัปเดตข้อมูลล่าสุด: <strong id="lastUpdateDate"></strong></span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:13px;font-weight:600;color:var(--text-secondary);">เดือน:</span>
+          <select id="monthSelect" class="month-select" onchange="handleMonthChange()">
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+        </div>
       </div>
-      <span id="lastUpdateWrapper" style="font-size:11px;color:var(--muted);display:none;">อัปเดตข้อมูลล่าสุด: <strong id="lastUpdateDate"></strong></span>
+
+      <!-- แถวล่าง: ฟิลเตอร์ -->
+      <div class="header-filters">
+        <span class="header-filter-label"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/></svg> Filter:</span>
+        <select id="filterBranch" class="header-filter-select" onchange="applyFilters()"><option value="">ทุกสาขา</option></select>
+        <select id="filterObjective" class="header-filter-select" onchange="applyFilters()">
+          <option value="">ทุก Objective</option>
+          <option value="Follower">Follower</option>
+          <option value="Video view">Video view</option>
+        </select>
+        <button class="header-clear-btn" onclick="clearFilters()" title="ล้างตัวกรอง">✕</button>
+      </div>
+
     </div>
-    <button id="themeToggle" class="btn btn-outline" style="padding:8px;display:flex;align-items:center;justify-content:center;border-radius:50%;width:36px;height:36px;">
+    <button id="themeToggle" class="btn btn-outline" style="padding:8px;display:flex;align-items:center;justify-content:center;border-radius:50%;width:36px;height:36px;margin-left:8px;">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
   </div>
@@ -233,17 +252,6 @@
 
 <div class="main">
   <div id="statusBar"></div>
-  <div class="filter-row">
-    <span class="filter-label"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/></svg> Filter:</span>
-    <select id="filterBranch" onchange="applyFilters()"><option value="">ทุกสาขา</option></select>
-    <select id="filterObjective" onchange="applyFilters()">
-      <option value="">ทุก Objective</option>
-      <option value="Follower">Follower</option>
-      <option value="Video view">Video view</option>
-    </select>
-    <button class="clear-btn" onclick="clearFilters()">✕ ล้างตัวกรอง</button>
-  </div>
-
   <div id="kpiSection"></div>
 
   <!-- รวมกราฟและเพิ่ม Filter เลือกประเภท -->
@@ -590,7 +598,7 @@ function renderKPIs() {
   }
 
   const g1=[
-    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>','Total Cost','฿'+cm.cost.toFixed(2),'THB','var(--primary)', cm.cost, pm.cost, true),
+    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>','Total Cost','฿'+cm.cost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}),'THB','var(--primary)', cm.cost, pm.cost, true),
     card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>','Impressions',cm.impr.toLocaleString(),'Total impressions','var(--blue)', cm.impr, pm.impr, false),
     card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>','Reach',cm.reach.toLocaleString(),'Unique reach','var(--green)', cm.reach, pm.reach, false),
     card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>','Video Views',cm.views.toLocaleString(),'Total video views','#8B5CF6', cm.views, pm.views, false),
@@ -603,15 +611,15 @@ function renderKPIs() {
     card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>','Share',cm.shares.toLocaleString(),'Paid shares','var(--green)', cm.shares, pm.shares, false),
     card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 9 5 12 1.8-5.2L21 14Z"/><path d="M7.2 2.2 8 5.1"/><path d="m5.1 8-2.9-.8"/><path d="M14 4.1 12 6"/><path d="m6 12-1.9 2"/></svg>','Profile Visit',cm.prof.toLocaleString(),'Paid profile visits','#8B5CF6', cm.prof, pm.prof, false),
     card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>','Favorite',cm.fav.toLocaleString(),'Paid favorites','var(--primary)', cm.fav, pm.fav, false),
-    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4"/><path d="M10 8v8"/><path d="M14 5v14"/><path d="M18 9v6"/><path d="M22 12h-2"/></svg>','Frequency',cm.freq.toFixed(2),'Impressions / Reach','#F43F5E', cm.freq, pm.freq, true),
+    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4"/><path d="M10 8v8"/><path d="M14 5v14"/><path d="M18 9v6"/><path d="M22 12h-2"/></svg>','Frequency',cm.freq.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}),'Impressions / Reach','#F43F5E', cm.freq, pm.freq, true),
   ];
   const g3=[
-    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><line x1="16.71" y1="13.88" x2="17.71" y2="13.88"/></svg>','Cost Per Mille','฿'+cm.cpm.toFixed(2),'Cost per 1,000 impressions','var(--blue)', cm.cpm, pm.cpm, true, '฿35 – ฿105'),
-    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="M14.5 9a2 2 0 0 0-2-1h-1a2 2 0 0 0 0 4h1a2 2 0 0 1 0 4h-1a2 2 0 0 1-2-1"/><line x1="12" y1="7" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="17"/></svg>','Cost Per View','฿'+cm.cpv.toFixed(2),'Cost per video view','#8B5CF6', cm.cpv, pm.cpv, true, '฿0.10 – ฿0.35'),
-    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>','Cost Per Follower','฿'+cm.cpf.toFixed(2),'Cost per new follower','var(--green)', cm.cpf, pm.cpf, true, '฿10 – ฿15'),
-    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>','VTR',cm.vtr.toFixed(2)+'%','Video view-through rate','var(--primary)', cm.vtr, pm.vtr, false, '60% – 80%'),
-    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="3" x2="3" y2="21"/><line x1="3" y1="21" x2="21" y2="21"/><polyline points="7 16 11 12 15 14 20 9"/></svg>','Follower Rate',cm.flwr.toFixed(2)+'%','Follows per impression','var(--accent)', cm.flwr, pm.flwr, false, '0.50% – 1.00%'),
-    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>','Engagement Rate',cm.engr.toFixed(2)+'%','Engagement per impression','#F43F5E', cm.engr, pm.engr, false, '5.70%'),
+    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><line x1="16.71" y1="13.88" x2="17.71" y2="13.88"/></svg>','Cost Per Mille','฿'+cm.cpm.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}),'Cost per 1,000 impressions','var(--blue)', cm.cpm, pm.cpm, true, '฿35 – ฿105'),
+    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="M14.5 9a2 2 0 0 0-2-1h-1a2 2 0 0 0 0 4h1a2 2 0 0 1 0 4h-1a2 2 0 0 1-2-1"/><line x1="12" y1="7" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="17"/></svg>','Cost Per View','฿'+cm.cpv.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}),'Cost per video view','#8B5CF6', cm.cpv, pm.cpv, true, '฿0.10 – ฿0.35'),
+    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>','Cost Per Follower','฿'+cm.cpf.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}),'Cost per new follower','var(--green)', cm.cpf, pm.cpf, true, '฿10 – ฿15'),
+    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>','VTR',cm.vtr.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})+'%','Video view-through rate','var(--primary)', cm.vtr, pm.vtr, false, '60% – 80%'),
+    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="3" x2="3" y2="21"/><line x1="3" y1="21" x2="21" y2="21"/><polyline points="7 16 11 12 15 14 20 9"/></svg>','Follower Rate',cm.flwr.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})+'%','Follows per impression','var(--accent)', cm.flwr, pm.flwr, false, '0.50% – 1.00%'),
+    card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>','Engagement Rate',cm.engr.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})+'%','Engagement per impression','#F43F5E', cm.engr, pm.engr, false, '5.70%'),
   ];
 
   document.getElementById('kpiSection').innerHTML=`
@@ -674,7 +682,7 @@ function renderCharts() {
                         let label = context.dataset.label || '';
                         if (label) label += ': ';
                         if (context.dataset.yAxisID === 'y1') {
-                            label += '฿' + context.parsed.y.toFixed(2);
+                            label += '฿' + context.parsed.y.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                         } else {
                             label += context.parsed.y.toLocaleString();
                         }
@@ -820,7 +828,7 @@ function renderTopAds() {
         <div class="carousel-info">
           <div class="carousel-ad-title" title="${r.ad}">#${i+1} ${r.ad}</div>
           <div class="carousel-stat"><span>Views:</span> <strong>${r.videoViews.toLocaleString()}</strong></div>
-          <div class="carousel-stat"><span>Cost:</span> <strong>฿${r.cost.toFixed(2)}</strong></div>
+          <div class="carousel-stat"><span>Cost:</span> <strong>฿${r.cost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></div>
         </div>
       </div>
     `;
@@ -846,13 +854,13 @@ function renderTable() {
     <td title="${r.ad}" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;">${r.ad}</td>
     <td>${r.branch}</td>
     <td><span class="badge badge-objective">${r.objective}</span></td>
-    <td class="cost-cell">฿${r.cost.toFixed(2)}</td>
+    <td class="cost-cell">฿${r.cost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
     <td class="num">${r.reach.toLocaleString()}</td>
     <td class="num">${r.impressions.toLocaleString()}</td>
     <td class="num">${r.videoViews.toLocaleString()}</td>
-    <td class="num">${r.likes}</td>
-    <td class="num">${r.follows}</td>
-    <td class="num">${r.shares}</td>
+    <td class="num">${r.likes.toLocaleString()}</td>
+    <td class="num">${r.follows.toLocaleString()}</td>
+    <td class="num">${r.shares.toLocaleString()}</td>
   </tr>`).join('');
 }
 
