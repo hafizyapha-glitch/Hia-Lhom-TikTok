@@ -45,25 +45,31 @@
   .logo-area img { width: 64px; height: 64px; object-fit: cover; border-radius: 12px; box-shadow: var(--shadow-sm); }
   .logo-title { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
   .logo-sub { font-size: 12px; color: var(--muted); font-weight: 500; }
-  .header-right { display: flex; align-items: center; gap: 16px; }
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
   
   .main { padding: 18px 64px; max-width: 1440px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+
+  /* --- Unified Header Controls --- */
+  .header-row { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+  .header-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
   
-  .btn-outline { background: var(--surface); border: 1px solid var(--border); color: var(--text); cursor: pointer; transition: all .2s; }
-  .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+  .header-select {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+    padding: 0 28px 0 12px; height: 36px; min-width: 140px; font-size: 13px; font-weight: 500;
+    font-family: 'Inter','Noto Sans Thai',sans-serif; outline: none; cursor: pointer; transition: border-color .2s;
+    appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748B' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center; box-shadow: var(--shadow-sm);
+  }
+  body.dark-mode .header-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394A3B8' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+  .header-select:focus { border-color: var(--primary); }
 
-  .month-select { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; color: var(--text); padding: 6px 32px 6px 12px; font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif; outline: none; cursor: pointer; transition: border-color .2s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748B' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
-  body.dark-mode .month-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394A3B8' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
-  .month-select:focus { border-color: var(--primary); }
-
-  /* --- Header Filters (ลดขนาดลง 10%) --- */
-  .header-filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: flex-end; }
-  .header-filter-select { background: var(--card); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 6px 28px 6px 12px; font-size: 12px; font-weight: 500; font-family: 'Inter','Noto Sans Thai',sans-serif; outline: none; cursor: pointer; transition: border-color .2s; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2364748B' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; box-shadow: var(--shadow-sm); }
-  body.dark-mode .header-filter-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394A3B8' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
-  .header-filter-select:focus { border-color: var(--primary); }
-  .header-filter-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
-  .header-clear-btn { background: transparent; border: 1px solid transparent; border-radius: 6px; color: var(--muted); padding: 6px 10px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all .2s; }
-  .header-clear-btn:hover { color: var(--text); background: var(--surface); border-color: var(--border); }
+  .header-icon-btn {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 50%; color: var(--text-secondary);
+    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .2s; padding: 0; flex-shrink: 0; outline: none; font-size: 14px;
+    box-shadow: var(--shadow-sm);
+  }
+  .header-icon-btn:hover { color: var(--primary); border-color: var(--primary); }
 
   .kpi-group-label { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 16px; margin-top: 8px; }
   .kpi-grid { display: grid; gap: 16px; margin-bottom: 8px; }
@@ -186,10 +192,10 @@
     .charts-grid { grid-template-columns: 1fr; }
     .chart-card.wide { grid-column: span 1; }
     .header { padding: 16px; flex-direction: column; gap: 16px; align-items: flex-start; }
-    .header-right { width: 100%; justify-content: space-between; }
+    .header-right { align-items: flex-start; }
+    .header-row { justify-content: flex-start; }
     .kpi-grid.row6, .kpi-grid.row5 { grid-template-columns: repeat(2,1fr); }
     td, th { padding: 12px 16px; }
-    .header-filters { justify-content: flex-start; }
   }
   @media (max-width: 600px) {
     .kpi-grid.row6, .kpi-grid.row5 { grid-template-columns: 1fr; }
@@ -207,46 +213,44 @@
     </div>
   </div>
   <div class="header-right">
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
-      
-      <!-- แถวบน: เลือกเดือน และ วันที่อัปเดต -->
-      <div style="display:flex;align-items:center;gap:12px;">
-        <span id="lastUpdateWrapper" style="font-size:11px;color:var(--muted);display:none;">อัปเดตข้อมูลล่าสุด: <strong id="lastUpdateDate"></strong></span>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:13px;font-weight:600;color:var(--text-secondary);">เดือน:</span>
-          <select id="monthSelect" class="month-select" onchange="handleMonthChange()">
-            <option value="January">January</option>
-            <option value="February">February</option>
-            <option value="March">March</option>
-            <option value="April">April</option>
-            <option value="May">May</option>
-            <option value="June">June</option>
-            <option value="July">July</option>
-            <option value="August">August</option>
-            <option value="September">September</option>
-            <option value="October">October</option>
-            <option value="November">November</option>
-            <option value="December">December</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- แถวล่าง: ฟิลเตอร์ -->
-      <div class="header-filters">
-        <span class="header-filter-label"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/></svg> Filter:</span>
-        <select id="filterBranch" class="header-filter-select" onchange="applyFilters()"><option value="">ทุกสาขา</option></select>
-        <select id="filterObjective" class="header-filter-select" onchange="applyFilters()">
-          <option value="">ทุก Objective</option>
-          <option value="Follower">Follower</option>
-          <option value="Video view">Video view</option>
-        </select>
-        <button class="header-clear-btn" onclick="clearFilters()" title="ล้างตัวกรอง">✕</button>
-      </div>
-
+    
+    <!-- แถวบน: เลือกเดือน และ เปลี่ยนโหมด (ขนาดปุ่มโหมด เท่ากับปุ่ม Clear Filter) -->
+    <div class="header-row">
+      <span id="lastUpdateWrapper" style="font-size:11px;color:var(--muted);display:none;margin-right:8px;">อัปเดตข้อมูลล่าสุด: <strong id="lastUpdateDate"></strong></span>
+      <span class="header-label">เดือน:</span>
+      <select id="monthSelect" class="header-select" onchange="handleMonthChange()">
+        <option value="January">January</option>
+        <option value="February">February</option>
+        <option value="March">March</option>
+        <option value="April">April</option>
+        <option value="May">May</option>
+        <option value="June">June</option>
+        <option value="July">July</option>
+        <option value="August">August</option>
+        <option value="September">September</option>
+        <option value="October">October</option>
+        <option value="November">November</option>
+        <option value="December">December</option>
+      </select>
+      <button id="themeToggle" class="header-icon-btn" title="เปลี่ยนโหมดหน้าจอ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
     </div>
-    <button id="themeToggle" class="btn btn-outline" style="padding:8px;display:flex;align-items:center;justify-content:center;border-radius:50%;width:36px;height:36px;margin-left:8px;">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
+
+    <!-- แถวล่าง: ฟิลเตอร์สาขา และ Objective -->
+    <div class="header-row">
+      <span class="header-label">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/></svg> Filter:
+      </span>
+      <select id="filterBranch" class="header-select" onchange="applyFilters()"><option value="">ทุกสาขา</option></select>
+      <select id="filterObjective" class="header-select" onchange="applyFilters()">
+        <option value="">ทุก Objective</option>
+        <option value="Follower">Follower</option>
+        <option value="Video view">Video view</option>
+      </select>
+      <button class="header-icon-btn" onclick="clearFilters()" title="ล้างตัวกรอง">✕</button>
+    </div>
+
   </div>
 </div>
 
@@ -262,7 +266,7 @@
         <div class="chart-sub" id="mainChartSub" style="margin-bottom: 0;">เปรียบเทียบยอดเข้าชมวิดีโอ (Video Views) และต้นทุนการรับชม (CPV) ในแต่ละสาขา</div>
       </div>
       <div>
-        <select id="chartMetricFilter" class="month-select" onchange="renderCharts()" style="padding-top: 6px; padding-bottom: 6px; font-size: 13px;">
+        <select id="chartMetricFilter" class="header-select" onchange="renderCharts()" style="min-width:180px;">
           <option value="view">ยอดวิว (View)</option>
           <option value="follow">ยอดฟอล (Follower)</option>
           <option value="engagement">การมีส่วนร่วม (Engagement)</option>
@@ -281,7 +285,7 @@
         <div class="chart-sub" style="margin-bottom: 0;">ภาพรวมชิ้นงานโฆษณา (เฉพาะแอดที่มีการจ่ายเงิน)</div>
       </div>
       <div>
-        <select id="adsRankFilter" class="month-select" onchange="renderTopAds()" style="padding-top: 6px; padding-bottom: 6px; font-size: 13px;">
+        <select id="adsRankFilter" class="header-select" onchange="renderTopAds()" style="min-width:180px;">
           <option value="top">Top 10 (ยอดวิวสูงสุด)</option>
           <option value="bottom">Bottom 10 (ยอดวิวต่ำสุด)</option>
         </select>
@@ -319,14 +323,11 @@
 
 <script>
 function parseBranch(campaign) {
-  // รองรับการคั่นด้วย | หรือ -
   const parts = campaign.split(/\||-/).map(p => p.trim());
-  // หาคำที่มีคำว่า "สาขา" หรือ "Hia Lhom"
   let b = parts.find(p => p.includes('สาขา') || p.includes('Hia Lhom'));
-  
   if (b) {
     if (b.includes('Hia Lhom')) return 'Hia Lhom (รวม)';
-    return b; // ส่งคืนชื่อเต็มๆ เช่น "สาขาตลาดนานาเจริญ"
+    return b;
   }
   return campaign;
 }
@@ -337,7 +338,6 @@ function parseObjective(campaign) {
   return 'Other';
 }
 
-// ข้อมูลจำลองสำหรับโหมด Preview (กรณีอ้างอิงไฟล์ Local ไม่ได้)
 function getMockData(month) {
   return [
     { 'Ad name': 'Ad_Promo_1', 'Campaign name': 'Promo | สาขาปิ่นเกล้า | Video view', 'Spend': 1250.50, 'Reach': 45000, 'Impressions': 52000, 'Video views': 18000, 'Paid likes': 450, 'Paid comments': 25, 'Paid shares': 40, 'Paid follows': 80 },
@@ -356,35 +356,22 @@ let currentMonthStr = "";
 let prevMonthStr = "";
 let hasPrevData = false;
 let charts = {};
-let creativeLinks = {}; // ตัวแปรเก็บข้อมูล Link
+let creativeLinks = {}; 
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 async function fetchCreativeLinks() {
   try {
-    // เช็คสภาพแวดล้อม (หากไม่ได้รันผ่าน HTTP/HTTPS จะทำให้ดึงไฟล์จาก Local ไม่ได้)
     if (window.location.protocol === 'blob:' || window.location.protocol === 'about:' || window.location.protocol === 'data:') {
-      creativeLinks = {
-        'Ad_Promo_1': 'https://www.tiktok.com/',
-        'Ad_Promo_2': 'https://www.tiktok.com/',
-        'Ad_Brand_1': 'https://www.tiktok.com/',
-        "KOLs-OLE' CH -ตามหาทองนพคุณ": 'https://www.tiktok.com/'
-      };
+      creativeLinks = { 'Ad_Promo_1': 'https://www.tiktok.com/', 'Ad_Promo_2': 'https://www.tiktok.com/', 'Ad_Brand_1': 'https://www.tiktok.com/', "KOLs-OLE' CH -ตามหาทองนพคุณ": 'https://www.tiktok.com/' };
       return;
     }
-
     let res = await fetch(`./data/TikTok_Creative_Link.csv`);
     if (res.ok) {
       const text = await res.text();
       Papa.parse(text, { 
         header: true, skipEmptyLines: true, 
-        complete: r => {
-          r.data.forEach(row => {
-            const adName = row['Ad name'] || row['Ad Name'] || row['ad'];
-            const link = row['Link'] || row['URL'] || row['Creative Link'];
-            if(adName && link) creativeLinks[adName] = link;
-          });
-        } 
+        complete: r => { r.data.forEach(row => { const adName = row['Ad name'] || row['Ad Name'] || row['ad']; const link = row['Link'] || row['URL'] || row['Creative Link']; if(adName && link) creativeLinks[adName] = link; }); } 
       });
       return;
     }
@@ -394,32 +381,24 @@ async function fetchCreativeLinks() {
       const wb = XLSX.read(buffer, {type: 'array'});
       const ws = wb.Sheets[wb.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(ws, {defval: ''});
-      data.forEach(row => {
-        const adName = row['Ad name'] || row['Ad Name'] || row['ad'];
-        const link = row['Link'] || row['URL'] || row['Creative Link'];
-        if(adName && link) creativeLinks[adName] = link;
-      });
+      data.forEach(row => { const adName = row['Ad name'] || row['Ad Name'] || row['ad']; const link = row['Link'] || row['URL'] || row['Creative Link']; if(adName && link) creativeLinks[adName] = link; });
     }
   } catch (e) { 
-    console.warn("ไม่สามารถดึงไฟล์ TikTok_Creative_Link ได้ (อาจติด CORS หรือเปิดผ่าน file://):", e.message); 
+    console.warn("ไม่สามารถดึงไฟล์ TikTok_Creative_Link ได้:", e.message); 
   }
 }
 
 async function fetchRawData(month) {
   try {
-    // ป้องกัน Failed to parse URL บนโหมด Preview/Sandbox
     if (window.location.protocol === 'blob:' || window.location.protocol === 'about:' || window.location.protocol === 'data:') {
       console.warn(`[Preview Mode] แสดงข้อมูล Mock สำหรับเดือน ${month} เนื่องจากไม่สามารถดึงไฟล์ Local ได้`);
       return { data: getMockData(month), file: `(Mock) ${month}.csv` };
     }
-
     let res = await fetch(`./data/${month}.csv`);
     if (res.ok) {
       const text = await res.text();
       const lastMod = res.headers.get('Last-Modified');
-      return new Promise(resolve => {
-        Papa.parse(text, { header: true, skipEmptyLines: true, complete: r => resolve({ data: r.data, lastMod, file: `${month}.csv` }) });
-      });
+      return new Promise(resolve => { Papa.parse(text, { header: true, skipEmptyLines: true, complete: r => resolve({ data: r.data, lastMod, file: `${month}.csv` }) }); });
     }
     res = await fetch(`./data/${month}.xlsx`);
     if (res.ok) {
@@ -450,7 +429,6 @@ function processRawData(rows) {
 
 async function fetchMonthData(month) {
   showStatus(`⏳ กำลังโหลดข้อมูลเดือน ${month}...`);
-  
   currentMonthStr = month;
   const mIdx = months.indexOf(month);
   const pIdx = mIdx === 0 ? 11 : mIdx - 1;
@@ -461,9 +439,7 @@ async function fetchMonthData(month) {
 
   if (!currentRaw) {
     showStatus(`⚠️ ไม่พบไฟล์ข้อมูล ./data/${month}.csv หรือ .xlsx`);
-    allData = []; filteredData = []; 
-    prevAllData = []; prevFilteredData = [];
-    hasPrevData = false;
+    allData = []; filteredData = []; prevAllData = []; prevFilteredData = []; hasPrevData = false;
     document.getElementById('lastUpdateWrapper').style.display = 'none';
     renderAll();
     document.getElementById('tableCount').textContent = `ไม่มีข้อมูลสำหรับเดือน ${month}`;
@@ -473,14 +449,8 @@ async function fetchMonthData(month) {
   allData = processRawData(currentRaw.data);
   filteredData = [...allData];
 
-  if (prevRaw) {
-    prevAllData = processRawData(prevRaw.data);
-    prevFilteredData = [...prevAllData];
-    hasPrevData = prevAllData.length > 0;
-  } else {
-    prevAllData = []; prevFilteredData = [];
-    hasPrevData = false;
-  }
+  if (prevRaw) { prevAllData = processRawData(prevRaw.data); prevFilteredData = [...prevAllData]; hasPrevData = prevAllData.length > 0; } 
+  else { prevAllData = []; prevFilteredData = []; hasPrevData = false; }
 
   populateBranchFilter();
   renderAll();
@@ -489,35 +459,22 @@ async function fetchMonthData(month) {
   const dateStr = dateObj.toLocaleString('th-TH', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
   document.getElementById('lastUpdateDate').textContent = dateStr;
   document.getElementById('lastUpdateWrapper').style.display = 'inline-flex';
-
   showStatus(`✅ โหลดข้อมูล ${currentRaw.file} สำเร็จ: ${allData.length} รายการ`);
 }
 
-function handleMonthChange() {
-  const month = document.getElementById('monthSelect').value;
-  fetchMonthData(month);
-}
+function handleMonthChange() { fetchMonthData(document.getElementById('monthSelect').value); }
 
-// Initial Loading logic
 (async function init() {
-  await fetchCreativeLinks(); // โหลดลิงก์ก่อนเริ่ม
+  await fetchCreativeLinks();
   const currentMonthIndex = new Date().getMonth(); 
   const initialMonth = months[currentMonthIndex];
   document.getElementById('monthSelect').value = initialMonth;
   fetchMonthData(initialMonth);
 })();
 
-function destroyCharts() { 
-  Object.values(charts).forEach(c => { if(c) c.destroy(); }); 
-  charts = {}; 
-}
+function destroyCharts() { Object.values(charts).forEach(c => { if(c) c.destroy(); }); charts = {}; }
 
-function renderAll() { 
-  renderKPIs(); 
-  renderCharts(); 
-  renderTopAds();
-  renderTable(); 
-}
+function renderAll() { renderKPIs(); renderCharts(); renderTopAds(); renderTable(); }
 
 function populateBranchFilter() {
   const branches=[...new Set(allData.map(r=>r.branch))].filter(b=>b!=='-').sort();
@@ -532,18 +489,12 @@ function applyFilters() {
 }
 
 function clearFilters() { 
-  document.getElementById('filterBranch').value=''; 
-  document.getElementById('filterObjective').value=''; 
-  filteredData=[...allData]; 
-  prevFilteredData=[...prevAllData];
-  renderAll(); 
+  document.getElementById('filterBranch').value=''; document.getElementById('filterObjective').value=''; 
+  filteredData=[...allData]; prevFilteredData=[...prevAllData]; renderAll(); 
 }
 
 function showStatus(msg) { 
-  const bar=document.getElementById('statusBar'); 
-  bar.textContent=msg; 
-  bar.style.display='block'; 
-  setTimeout(()=>{bar.style.display='none';},4000); 
+  const bar=document.getElementById('statusBar'); bar.textContent=msg; bar.style.display='block'; setTimeout(()=>{bar.style.display='none';},4000); 
 }
 
 function calcMetrics(d) {
@@ -564,30 +515,22 @@ function renderKPIs() {
   const pm = calcMetrics(prevFilteredData);
 
   function card(icon, label, value, sub, color, currVal, prevVal, invertColor = false, benchmark = '') {
-    let footerHtml = '';
     let diffHtml = '';
-    
     if (hasPrevData) {
-        if (prevVal === 0 && currVal === 0) {
-            diffHtml = `<span class="kpi-diff diff-neutral">-</span>`;
-        } else if (prevVal === 0 && currVal > 0) {
-            diffHtml = `<span class="kpi-diff diff-neutral">New</span>`;
-        } else {
-            const diff = ((currVal - prevVal) / prevVal) * 100;
-            const abs = Math.abs(diff).toFixed(1);
+        if (prevVal === 0 && currVal === 0) diffHtml = `<span class="kpi-diff diff-neutral">-</span>`;
+        else if (prevVal === 0 && currVal > 0) diffHtml = `<span class="kpi-diff diff-neutral">New</span>`;
+        else {
+            const diff = ((currVal - prevVal) / prevVal) * 100; const abs = Math.abs(diff).toFixed(1);
             if (diff > 0) diffHtml = `<span class="kpi-diff ${invertColor ? 'diff-bad' : 'diff-good'}">↑ ${abs}%</span>`;
             else if (diff < 0) diffHtml = `<span class="kpi-diff ${invertColor ? 'diff-good' : 'diff-bad'}">↓ ${abs}%</span>`;
             else diffHtml = `<span class="kpi-diff diff-neutral">- 0%</span>`;
         }
-    } else {
-        diffHtml = `<span class="kpi-diff diff-neutral" title="ไม่มีข้อมูลเดือนก่อนหน้า">N/A</span>`;
-    }
+    } else diffHtml = `<span class="kpi-diff diff-neutral" title="ไม่มีข้อมูลเดือนก่อนหน้า">N/A</span>`;
     
     const pName = prevMonthStr.substring(0, 3);
     const compRow = `<div class="kpi-compare"><span class="diff-label">vs ${pName}</span>${diffHtml}</div>`;
     const bmRow = benchmark ? `<div class="kpi-benchmark"><span class="bm-label">Benchmark</span><span class="bm-val">${benchmark}</span></div>` : '';
-    
-    footerHtml = `<div class="kpi-footer">${compRow}${bmRow}</div>`;
+    const footerHtml = `<div class="kpi-footer">${compRow}${bmRow}</div>`;
 
     return `<div class="kpi-card">
       <div class="kpi-label">${label}</div>
@@ -641,10 +584,8 @@ function renderCharts() {
   const d=filteredData;
   const branches=[...new Set(d.map(r=>r.branch))];
 
-  // อ่านค่าว่าผู้ใช้เลือกดูกราฟอะไร
   const metric = document.getElementById('chartMetricFilter') ? document.getElementById('chartMetricFilter').value : 'view';
 
-  // อัปเดตหัวข้อและคำอธิบายตามกราฟที่เลือก
   const titleEl = document.getElementById('mainChartTitle');
   const subEl = document.getElementById('mainChartSub');
   if(titleEl && subEl) {
@@ -785,14 +726,12 @@ function renderTopAds() {
   const container = document.getElementById('topAdsCarousel');
   const rankFilter = document.getElementById('adsRankFilter') ? document.getElementById('adsRankFilter').value : 'top';
   
-  // กรองเอาเฉพาะโฆษณาที่มีการใช้จ่าย (cost > 0) เพื่อไม่ให้ Bottom 10 ดึงแอดที่ปิดไปแล้วมาแสดง
   let validAds = [...filteredData].filter(r => r.cost > 0);
   
-  // จัดเรียงข้อมูลที่ Filter แล้ว ตาม Video Views
   if (rankFilter === 'bottom') {
-    validAds.sort((a, b) => a.videoViews - b.videoViews); // ยอดวิวน้อยไปมาก (Bottom)
+    validAds.sort((a, b) => a.videoViews - b.videoViews); 
   } else {
-    validAds.sort((a, b) => b.videoViews - a.videoViews); // ยอดวิวมากไปน้อย (Top)
+    validAds.sort((a, b) => b.videoViews - a.videoViews); 
   }
   
   let displayData = validAds.slice(0, 10);
@@ -803,20 +742,17 @@ function renderTopAds() {
   }
 
   container.innerHTML = displayData.map((r, i) => {
-    // ดึง Link จากข้อมูล หากไม่มีให้เป็นค่าว่าง
     const link = creativeLinks[r.ad] || ''; 
     const linkTagStart = link ? `<a href="${link}" target="_blank" rel="noopener noreferrer" class="carousel-image-wrapper">` : `<div class="carousel-image-wrapper">`;
     const linkTagEnd = link ? `</a>` : `</div>`;
     const iconHtml = link ? `<div class="external-link-icon" title="เปิดในแท็บใหม่"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>` : '';
     
-    // ตั้งชื่อไฟล์รูปให้ตรงกับ Ad name พร้อมจัดการช่องว่างและอักขระพิเศษ (ลบอัญประกาศออก)
     const cleanAdName = r.ad.replace(/['"]/g, '').trim();
     const encodedName = encodeURIComponent(cleanAdName);
     const jpgSrc = `./images/${encodedName}.jpg`;
     const pngSrc = `./images/${encodedName}.png`;
     const svgFallback = `data:image/svg+xml;charset=UTF-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22220%22 height=%22293%22 viewBox=%220 0 220 293%22 fill=%22%23E5E7EB%22%3E%3Crect width=%22220%22 height=%22293%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-size=%2214%22 fill=%22%2394A3B8%22%3ENo Image%3C/text%3E%3C/svg%3E`;
 
-    // ลองโหลด .jpg ก่อน ถ้าไม่เจอ (onerror) ให้ลองโหลด .png ถ้ายังไม่เจออีกให้แสดง No Image
     const onErrorScript = `this.onerror=function(){ this.onerror=null; this.src='${svgFallback}'; }; this.src='${pngSrc}';`;
 
     return `
@@ -846,7 +782,6 @@ function renderTable() {
   let d=filteredData;
   if(activeTab!=='all') d=d.filter(r=>r.objective===activeTab);
   
-  // Exclude rows where cost is 0
   d = d.filter(r => r.cost > 0);
 
   document.getElementById('tableCount').textContent=`แสดง ${d.length} รายการ`;
