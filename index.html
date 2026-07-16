@@ -210,15 +210,15 @@
         <div class="chart-sub" id="mainChartSub" style="margin-bottom: 0;">เปรียบเทียบยอดเข้าชมวิดีโอ (Video Views) และต้นทุนการรับชม (CPV) ในแต่ละสาขา</div>
       </div>
       <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-        <label style="font-size:13px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:6px;">
-          <input type="checkbox" id="chartOnlyBranchAds" onchange="renderCharts()"> เฉพาะชื่อขึ้นต้นด้วย "สาขา"
-        </label>
         <select id="chartMetricFilter" class="header-select" onchange="renderCharts()" style="min-width:180px;">
           <option value="view">ยอดวิว (View)</option>
           <option value="follow">ยอดฟอล (Follower)</option>
           <option value="engagement">การมีส่วนร่วม (Engagement)</option>
           <option value="spend">ค่าใช้จ่าย (Spend)</option>
         </select>
+        <label style="font-size:13px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <input type="checkbox" id="chartOnlyBranchAds" onchange="renderCharts()"> เฉพาะสาขา
+        </label>
       </div>
     </div>
     <div class="chart-wrap tall"><canvas id="mainChart"></canvas></div>
@@ -232,13 +232,13 @@
         <div class="chart-sub" style="margin-bottom: 0;">ภาพรวมชิ้นงานโฆษณา (เฉพาะแอดที่มีการจ่ายเงิน)</div>
       </div>
       <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-        <label style="font-size:13px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:6px;">
-          <input type="checkbox" id="carouselOnlyBranchAds" onchange="renderTopAds()"> เฉพาะชื่อขึ้นต้นด้วย "สาขา"
-        </label>
         <select id="adsRankFilter" class="header-select" onchange="renderTopAds()" style="min-width:180px;">
           <option value="top">Top 10 (ยอดวิวสูงสุด)</option>
           <option value="bottom">Bottom 10 (ยอดวิวต่ำสุด)</option>
         </select>
+        <label style="font-size:13px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:6px;">
+          <input type="checkbox" id="carouselOnlyBranchAds" onchange="renderTopAds()"> เฉพาะสาขา
+        </label>
       </div>
     </div>
     <div class="carousel-container" id="topAdsCarousel">
