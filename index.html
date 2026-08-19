@@ -771,19 +771,27 @@ function renderTable() {
     const branchFilter = document.getElementById('filterBranch').value;
     const objFilter = document.getElementById('filterObjective').value;
     const metricsByMonth = {};
+    let allYearData = []; // สร้างตัวแปรเก็บข้อมูลรวมทั้งปี
     
     months.forEach(m => {
       let d = allMonthsRawData[m] || [];
       if (branchFilter) d = d.filter(r => r.branch === branchFilter);
       if (objFilter) d = d.filter(r => r.objective === objFilter);
       metricsByMonth[m] = calcMetrics(d);
+      
+      // เอาข้อมูลแต่ละเดือนไปรวมก้อนใหญ่ เพื่อหา Total ที่ถูกต้องตามสูตรคำนวณ
+      allYearData = allYearData.concat(d); 
     });
 
-    // สร้างหัวตาราง (แกนนอน = เดือน)
+    // คำนวณ Metric ของทั้งปี
+    const totalMetrics = calcMetrics(allYearData);
+
+    // สร้างหัวตาราง (แกนนอน = เดือน) พร้อมคอลัมน์ Total
     const thead = `<tr>
       <th style="text-align:left; min-width:200px;">Metric</th>` + 
       months.map(m => `<th style="text-align:right;">${m.substring(0,3)}</th>`).join('') + 
-    `</tr>`;
+      `<th style="text-align:right; font-weight:700; color:var(--primary);">Total</th>
+    </tr>`;
 
     // Map ข้อมูล Metric ที่ต้องการแสดงผล (แกนตั้ง = ข้อมูล) เปลี่ยน Default เป็น 0
     const rows = [
@@ -806,7 +814,12 @@ function renderTable() {
         const val = (data && !isNaN(data[row.key])) ? data[row.key] : 0;
         return `<td class="num" style="text-align:right;">${row.format(val)}</td>`;
       }).join('');
-      return `<tr><td style="font-weight:600; color:var(--text);">${row.label}</td>${tdCells}</tr>`;
+
+      // ช่องตารางคอลัมน์ Total
+      const totalVal = (totalMetrics && !isNaN(totalMetrics[row.key])) ? totalMetrics[row.key] : 0;
+      const totalCell = `<td class="num" style="text-align:right; font-weight:700; color:var(--primary); background:rgba(37, 99, 235, 0.05);">${row.format(totalVal)}</td>`;
+
+      return `<tr><td style="font-weight:600; color:var(--text);">${row.label}</td>${tdCells}${totalCell}</tr>`;
     }).join('');
 
     // วาดตารางใหม่ทั้งหมด
