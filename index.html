@@ -258,6 +258,7 @@
       <button class="tab-btn active" onclick="switchTab('all',this)">ทั้งหมด</button>
       <button class="tab-btn" onclick="switchTab('Follower',this)">Follower</button>
       <button class="tab-btn" onclick="switchTab('Video view',this)">Video View</button>
+      <button class="tab-btn" onclick="switchTab('yearly',this)">Yearly Performance</button>
     </div>
     <div class="table-responsive">
       <table>
@@ -311,6 +312,30 @@ let creativeLinks = {};
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
+// --- Variables for Yearly Performance ---
+let allMonthsRawData = {};
+let isYearlyLoaded = false;
+
+async function loadAllMonths() {
+  if (isYearlyLoaded) return;
+  showStatus("⏳ กำลังรวบรวมข้อมูลรายปี...");
+  
+  const promises = months.map(m => fetchRawData(m));
+  const results = await Promise.all(promises);
+  
+  results.forEach((raw, i) => {
+    if (raw && raw.data) {
+      allMonthsRawData[months[i]] = processRawData(raw.data);
+    } else {
+      allMonthsRawData[months[i]] = [];
+    }
+  });
+  
+  isYearlyLoaded = true;
+  showStatus("✅ โหลดข้อมูลรายปีสำเร็จ");
+}
+// ----------------------------------------
+
 async function fetchCreativeLinks() {
   try {
     if (window.location.protocol === 'blob:' || window.location.protocol === 'about:' || window.location.protocol === 'data:') {
@@ -340,7 +365,7 @@ async function fetchCreativeLinks() {
 async function fetchRawData(month) {
   try {
     if (window.location.protocol === 'blob:' || window.location.protocol === 'about:' || window.location.protocol === 'data:') {
-      console.warn(`[Preview Mode] แสดงข้อมูล Mock สำหรับเดือน ${month}`);
+      // Mock data in preview mode
       return { data: getMockData(month), file: `(Mock) ${month}.csv` };
     }
     let res = await fetch(`./data/${month}.csv`);
@@ -511,7 +536,6 @@ function renderKPIs() {
     card('<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>','Engagement Rate',cm.engr.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})+'%','Engagement per impression','#F43F5E', cm.engr, pm.engr, false, '5.70%'),
   ];
 
-  // แก้ไขเป็นแสดงแบบ 2 บรรทัด บรรทัดละ 3 คอลัมน์ (row3)
   document.getElementById('kpiSection').innerHTML=`
     <div class="kpi-group-label">Overview</div>
     <div class="kpi-grid row3">${g1.slice(0,3).join('')}</div>
@@ -530,23 +554,19 @@ function renderCharts() {
   const isDark = document.body.classList.contains('dark-mode');
   const textColor = isDark ? '#F8FAFC' : '#111827';
   
-  // เช็ค Checkbox กรอง "สาขา"
   let chartData = [...filteredData];
   const chartCheckbox = document.getElementById('chartOnlyBranchAds');
   if (chartCheckbox && chartCheckbox.checked) {
     chartData = chartData.filter(r => r.ad.trim().startsWith('สาขา'));
   }
 
-  // ดึงค่าการดูข้อมูลและสาขาที่ถูกเลือก
   const metric = document.getElementById('chartMetricFilter') ? document.getElementById('chartMetricFilter').value : 'view';
   const selectedBranch = document.getElementById('filterBranch').value;
   
-  // โลจิก Drill-down (ถ้าเลือกสาขาเฉพาะเจาะจง ให้ดูกราฟแยกตาม Ads)
   const isAdLevel = selectedBranch !== ''; 
   const groupKey = isAdLevel ? 'ad' : 'branch'; 
   const groupLabels = [...new Set(chartData.map(r => r[groupKey]))];
 
-  // อัปเดต Title กราฟตามระดับข้อมูล (Branch vs Ad)
   const titleEl = document.getElementById('mainChartTitle');
   const subEl = document.getElementById('mainChartSub');
   if(titleEl && subEl) {
@@ -566,7 +586,6 @@ function renderCharts() {
     }
   }
 
-  // สไตล์แกนกราฟ
   function axisStyle() {
     return { grid:{color:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)'}, ticks:{color:isDark?'#94A3B8':'#6B7280',font:{family:'Inter,Noto Sans Thai',size:11}}, border:{color:'transparent'} };
   }
@@ -603,7 +622,6 @@ function renderCharts() {
      };
   }
 
-  // รวบรวมข้อมูลตาม Grouping (Branch หรือ Ad)
   let aggregated = groupLabels.map(label => {
       let items = chartData.filter(r => r[groupKey] === label);
       let cost = items.reduce((s,r) => s+r.cost, 0);
@@ -681,7 +699,6 @@ function renderTopAds() {
   const container = document.getElementById('topAdsCarousel');
   const rankFilter = document.getElementById('adsRankFilter') ? document.getElementById('adsRankFilter').value : 'top';
   
-  // เช็ค Checkbox กรอง "สาขา"
   let validAds = [...filteredData].filter(r => r.cost > 0);
   const carouselCheckbox = document.getElementById('carouselOnlyBranchAds');
   if (carouselCheckbox && carouselCheckbox.checked) {
@@ -707,7 +724,6 @@ function renderTopAds() {
     const linkTagEnd = link ? `</a>` : `</div>`;
     const iconHtml = link ? `<div class="external-link-icon" title="เปิดในแท็บใหม่"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></div>` : '';
     
-    // ทำความสะอาดชื่อไฟล์รูป
     const cleanAdName = r.ad.replace(/['"]/g, '').trim();
     const encodedName = encodeURIComponent(cleanAdName);
     const jpgSrc = `./images/${encodedName}.jpg`;
@@ -732,20 +748,85 @@ function renderTopAds() {
   }).join('');
 }
 
-function switchTab(tab,el) { 
-  activeTab=tab; 
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); 
+async function switchTab(tab, el) { 
+  activeTab = tab; 
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
   el.classList.add('active'); 
-  renderTable(); 
+  
+  if (tab === 'yearly') {
+    loadAllMonths().then(() => renderTable());
+  } else {
+    renderTable(); 
+  }
 }
 
 function renderTable() {
-  let d=filteredData;
-  if(activeTab!=='all') d=d.filter(r=>r.objective===activeTab);
+  const container = document.querySelector('.table-responsive');
+
+  // ถ้าเลือกหน้า Yearly Performance
+  if (activeTab === 'yearly') {
+    document.getElementById('tableCount').textContent = 'ข้อมูลสรุปรายปี (Yearly Performance)';
+    
+    // กรองข้อมูลตามสาขาและ Objective ที่เลือกด้านบนสุด
+    const branchFilter = document.getElementById('filterBranch').value;
+    const objFilter = document.getElementById('filterObjective').value;
+    const metricsByMonth = {};
+    
+    months.forEach(m => {
+      let d = allMonthsRawData[m] || [];
+      if (branchFilter) d = d.filter(r => r.branch === branchFilter);
+      if (objFilter) d = d.filter(r => r.objective === objFilter);
+      metricsByMonth[m] = calcMetrics(d);
+    });
+
+    // สร้างหัวตาราง (แกนนอน = เดือน)
+    const thead = `<tr>
+      <th style="text-align:left; min-width:200px;">Metric</th>` + 
+      months.map(m => `<th style="text-align:right;">${m.substring(0,3)}</th>`).join('') + 
+    `</tr>`;
+
+    // Map ข้อมูล Metric ที่ต้องการแสดงผล (แกนตั้ง = ข้อมูล) เปลี่ยน Default เป็น 0
+    const rows = [
+      { key: 'cost', label: 'Spending (฿)', format: v => (v || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) },
+      { key: 'reach', label: 'Reach', format: v => (v || 0).toLocaleString('en-US') },
+      { key: 'impr', label: 'Impression', format: v => (v || 0).toLocaleString('en-US') },
+      { key: 'eng', label: 'Post Engagement', format: v => (v || 0).toLocaleString('en-US') },
+      { key: 'views', label: 'Video Views', format: v => (v || 0).toLocaleString('en-US') },
+      { key: 'follows', label: 'Follows', format: v => (v || 0).toLocaleString('en-US') },
+      { key: 'freq', label: 'Frequency', format: v => (v || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) },
+      { key: 'cpm', label: 'Cost per 1,000 impressions (CPM)', format: v => (v || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) },
+      { key: 'cpv', label: 'Cost per View (CPV)', format: v => (v || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) },
+      { key: 'cpf', label: 'Cost per Follower (CPF)', format: v => (v || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) }
+    ];
+
+    const tbody = rows.map(row => {
+      const tdCells = months.map(m => {
+        const data = metricsByMonth[m];
+        // หากไม่มีข้อมูล ให้เป็น 0
+        const val = (data && !isNaN(data[row.key])) ? data[row.key] : 0;
+        return `<td class="num" style="text-align:right;">${row.format(val)}</td>`;
+      }).join('');
+      return `<tr><td style="font-weight:600; color:var(--text);">${row.label}</td>${tdCells}</tr>`;
+    }).join('');
+
+    // วาดตารางใหม่ทั้งหมด
+    container.innerHTML = `<table><thead>${thead}</thead><tbody>${tbody}</tbody></table>`;
+    return;
+  }
+
+  // --- การทำงานสำหรับ Tab ปกติ (ทั้งหมด, Follower, Video View) ---
+  let d = filteredData;
+  if(activeTab !== 'all') d = d.filter(r => r.objective === activeTab);
   d = d.filter(r => r.cost > 0);
 
-  document.getElementById('tableCount').textContent=`แสดง ${d.length} รายการ`;
-  document.getElementById('tableBody').innerHTML=d.map(r=>`<tr>
+  document.getElementById('tableCount').textContent = `แสดง ${d.length} รายการ`;
+
+  const thead = `<tr>
+    <th>Ad Name</th><th>สาขา</th><th>Objective</th><th>Cost (฿)</th><th>Reach</th><th>Impressions</th><th>Video Views</th>
+    <th>Likes</th><th>Follows</th><th>Shares</th>
+  </tr>`;
+
+  const tbody = d.map(r => `<tr>
     <td title="${r.ad}" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;">${r.ad}</td>
     <td>${r.branch}</td>
     <td><span class="badge badge-objective">${r.objective}</span></td>
@@ -757,6 +838,8 @@ function renderTable() {
     <td class="num">${r.follows.toLocaleString('en-US')}</td>
     <td class="num">${r.shares.toLocaleString('en-US')}</td>
   </tr>`).join('');
+  
+  container.innerHTML = `<table><thead>${thead}</thead><tbody id="tableBody">${tbody}</tbody></table>`;
 }
 
 if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark-mode');
